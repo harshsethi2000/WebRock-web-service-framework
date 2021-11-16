@@ -3,9 +3,13 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import com.thinking.machines.webrock.pojo.*;
 import com.thinking.machines.webrock.model.*;
+import com.thinking.machines.webrock.exceptions.*;
 import java.util.*;
 import java.lang.reflect.*;
 import java.io.*;
+import com.google.gson.*;
+
+
 public class TMWebRock extends HttpServlet
 {
 public boolean forwardedFromPOST=false;
@@ -31,6 +35,9 @@ Object obj;
 List<AutoWiredField> autoWiredFields;
 List<RequestParameterPojo> requestParameters;
 List<InjectRequestParameterPojo> injectRequestParameters;
+Gson gson =null;
+
+
 //Access webRockModel from application scope
 try
 {
@@ -69,6 +76,18 @@ if(service.getIsPostAllowed()==true && service.getIsGetAllowed()==false)
 System.out.println("request is of Post type but only get request is allowed hence throw some exception");
 }
 }
+
+//before invoking the method check if method is secured or not
+//and if method is secured then simply invoke the method mentioned in service 
+
+if(service.getIsSecured())
+{
+Class checkPostClass=Class.forName(service.getCheckPost());
+Object checkPostClassObj= checkPostClass.newInstance();
+Method guard=checkPostClass.getMethod(service.getGuard());
+guard.invoke(checkPostClassObj);
+}
+
 obj=service.getServiceClass().newInstance();
 System.out.println(obj);
 Class[] parameterClass=new Class[1];
@@ -274,6 +293,7 @@ System.out.println("ok");
 }
 }
 
+System.out.println("control is here");
 requestParameters=service.getRequestParameters();
 Object [] param=new Object[requestParameters.size()];
 int i=0;
@@ -282,7 +302,7 @@ for(RequestParameterPojo requestParameter:requestParameters)
 String name=requestParameter.getName();
 //check if it is present in requestScope
 String dataType=requestParameter.getDataType().getSimpleName();
-
+System.out.println("Data type is "+dataType);
 if(request.getParameter(name)!=null)
 {
 System.out.println("it is "+request.getParameter(name));
@@ -403,18 +423,21 @@ if(dataType.equals("RequestScope"))
 RequestScope requestScope=new RequestScope();
 requestScope.setAttribute(request);
 param[i]=requestScope;
+System.out.println("request scope");
 }
 else if(dataType.equals("SessionScope"))
 {
 SessionScope sessionScope=new SessionScope();
 sessionScope.setAttribute(request.getSession());
 param[i]=sessionScope;
+System.out.println("session scope");
 }
 else if(dataType.equals("ApplicationScope"))
 {
 ApplicationScope applicationScope=new ApplicationScope();
 applicationScope.setAttribute(getServletContext());
 param[i]=applicationScope;
+System.out.println("APplication scope");
 }else if(dataType.equals("ApplicationDirectory"))
 {
 //ApplicationDirectory applicationDirectory=new ApplicationDirectory();
@@ -426,29 +449,52 @@ else
 //dataType is not of any above type
 if(service.getIsJson()==true)
 {
+System.out.println("control is in json");
 //do json programming here
 System.out.println("one parameter is json and is of type "+dataType);
+BufferedReader br=request.getReader();
+StringBuffer stringBuffer=new StringBuffer();
+String tmp;
+while(true)
+{
+tmp=br.readLine();
+if(tmp==null)break;
+stringBuffer.append(tmp);
+}
+String rawData=stringBuffer.toString();
+System.out.println("raw data is "+rawData);
 
+gson=new Gson();
+System.out.println("okal");
+//System.out.println("is okkk"+gson.fromJson(rawData,);
+param[i]=gson.fromJson(rawData,requestParameter.getDataType());
 }
 }
 }
 i++;
 }//for loop ends here
 System.out.println("length of parameter is "+param.length);
-
+System.out.println("param is"+param);
 
 Method m=service.getService();
 m.invoke(obj,param);
-}catch(Exception e)
+PrintWriter pw=response.getWriter();
+response.setContentType("application/json");
+if(param.length==1)pw.print(gson.toJson(param[1]));
+}
+catch(InvocationTargetException ite)
 {
+//if any invoked method will throw exception then it will be wrapped up in InvocationTargetExcepion
+System.out.println(ite.getCause());
+}
+catch(Exception e)
+{
+System.out.println("Exception is "+e.getMessage());
 }
 }
 public void doPost(HttpServletRequest request,HttpServletResponse response)
-{
-     
+{     
 this.forwardedFromPOST=true;
 doGet(request,response);
 }
-
-
 }

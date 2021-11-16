@@ -127,7 +127,7 @@ Class injectSessionScopeAnnotation=Class.forName("com.thinking.machines.webrock.
 Class autoWiredAnnotation=Class.forName("com.thinking.machines.webrock.annotations.AutoWired");
 Class requestParameterAnnotation=Class.forName("com.thinking.machines.webrock.annotations.RequestParameter");
 Class injectRequestParameterAnnotation=Class.forName("com.thinking.machines.webrock.annotations.InjectRequestParameter");
-
+Class securedAccessAnnotation=Class.forName("com.thinking.machines.webrock.annotations.SecuredAccess");
 for(int i=0;i<className.size();i++)
 {
 List<AutoWiredField> autoWiredList=new ArrayList<AutoWiredField>();
@@ -145,6 +145,7 @@ boolean injectSessionScope=false;
 boolean injectApplicationDirectory=false;
 boolean injectApplicationScope=false;
 boolean injectRequestScope=false;
+
 if(myClass.getAnnotation(pathAnnotation)!=null)
 {
 classPathAnnotationValue=((Path)myClass.getAnnotation(pathAnnotation)).value();
@@ -240,6 +241,7 @@ requestParameterList.add(requestParameterPojo);
 
 System.out.println("Size of request parameter list is "+requestParameterList.size());
 
+
 Service service=new Service();
 service.setUrl(classPathAnnotationValue+methodPathAnnotationValue);
 service.setService(m);
@@ -274,6 +276,15 @@ service.setInjectSessionScope(injectSessionScope);
 service.setInjectApplicationScope(injectApplicationScope);
 service.setInjectRequestScope(injectRequestScope);
 service.setInjectApplicationDirectory(injectApplicationDirectory);
+
+if(myClass.getAnnotation(securedAccessAnnotation)!=null || m.getAnnotation(securedAccessAnnotation)!=null)
+{
+System.out.println("IS checkpost applied "+true);
+service.setIsSecured(true);
+service.setCheckPost(((SecuredAccess)myClass.getAnnotation(securedAccessAnnotation)).checkPost());
+service.setGuard(((SecuredAccess)myClass.getAnnotation(securedAccessAnnotation)).guard());
+}
+
 System.out.println("Class Name "+service.getServiceClass()+"Class Method"+service.getService()+"Get Request : "+service.getIsGetAllowed());
 System.out.println("Class NAme "+service.getServiceClass()+"Class Method"+service.getService()+"Post Request : "+service.getIsPostAllowed());
 System.out.println("Json count"+isJsonCount+"allowedParamCount"+allowedParamCount+"Request ann count "+requestParameterAnnotationCount);

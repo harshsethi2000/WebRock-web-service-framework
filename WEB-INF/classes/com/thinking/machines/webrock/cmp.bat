@@ -1,1 +1,1 @@
-javac -classpath c:\tomcat9\lib\*;c:\tomcat9\webapps\webrock\WEB-INF\classes;. *.java
+javac -classpath c:\tomcat9\lib\*;c:\tomcat9\webapps\webrock\WEB-INF\classes;c:\tomcat9\webapps\webrock\WEB-INF\lib\gson-2.8.7.jar;. *.java

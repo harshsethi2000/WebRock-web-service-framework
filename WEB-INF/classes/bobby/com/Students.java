@@ -4,6 +4,8 @@ import java.lang.reflect.*;
 import com.thinking.machines.webrock.pojo.*;       
 import com.thinking.machines.webrock.annotations.*;
 @Path("/students") 
+@POST
+@SecuredAccess(checkPost="bobby.com.SecuredGuard",guard="isSecured")
 public class Students
 {
 @AutoWired(name="xyz") public Students students;
@@ -18,18 +20,7 @@ public void setTeacher(Students teacher)
 this.teacher=teacher;
 System.out.println("Set teacher method is called");
 }
-@InjectRequestParameter("param1") public int x;
-public void setX(int x)
-{
-this.x=x;
-System.out.println("setter method of x is called"+x);
-}
-public static void main(String gg[])
-{
-test t=new test();
-Path p=t.getClass().getAnnotation(Path.class);
-System.out.println("value is: "+p.value());  
-}
+
 @Path("/add") public void methodOne()
 {
 System.out.println("Method one got executed");
@@ -42,31 +33,29 @@ System.out.println("Method two");
 {
 System.out.println("Method three");
 }
+@SecuredAccess(checkPost="something.sxy",guard="sjs")
 @Path("/doSomething") 
 public void doSomething(@RequestParameter("param1") float x,@RequestParameter("param2") String str)
 {
 System.out.println("DO something is called with parameter "+x+str);
 }
 
-@Path("/doSomething2") 
-public void doSomething2(@RequestParameter("param1") float x,RequestScope rs,SessionScope ss,ApplicationScope as)
-{
-System.out.println("DO something is called with parameter "+x+rs);
-}
+
+
 @Path("/doSomething3") 
-public void doSomething3(Students students,RequestScope rs,SessionScope ss,ApplicationScope as)
+public void doSomething3(RequestScope rs,Student students,SessionScope ss,ApplicationScope as)
 {
-System.out.println("DO something is called with parameter "+rs);
+System.out.println("DO something3 is called with parameter "+students);
 }
 @Path("/doSomething4") 
-public void doSomething4(Students students,TestFour testFour,RequestScope rs,SessionScope ss,ApplicationScope as)
+public void doSomething4(Student students,TestFour testFour,RequestScope rs,SessionScope ss,ApplicationScope as)
 {
-System.out.println("DO something is called with parameter "+rs);
+System.out.println("DO something is called with parameter "+students);
 }
 @Path("/doSomething5") 
-public void doSomething5(Students students,@RequestParameter("param1") float x,RequestScope rs,SessionScope ss,ApplicationScope as)
+public void doSomething5(Student students,@RequestParameter("param1") float x,RequestScope rs,SessionScope ss,ApplicationScope as)
 {
-System.out.println("DO something is called with parameter "+rs);
+System.out.println("DO something is called with parameter "+students);
 }
 
 

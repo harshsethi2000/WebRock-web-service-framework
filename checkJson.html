@@ -1,0 +1,48 @@
+<!Doctype html>
+<html>
+<head>
+<title>Check Json</title>
+<script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+<script>
+$(()=>{
+        // function will get executed 
+        // on click of submit button
+        $("#submitButton").click(function(ev) {
+alert("something")
+            
+            
+            
+            var obj={
+               age:$("#age").val(),
+               name:$("#name").val()
+                };
+
+            $.ajax({
+                type: "POST",
+                url: "TMWebRock/students/doSomething3",
+                data: JSON.stringify(obj),
+                contentType: "application/json",
+                 
+                success: function(data) {
+                      
+                    // Ajax call completed successfully
+                    alert("Form Submited Successfully");
+                },
+                error: function(data) {
+                      
+                    // Some error in ajax call
+                    alert("some Error"+data);
+                }
+            });
+        });
+    });
+</script>
+</head>
+<body>
+
+Age : <input type='text' name='age' id='age'></input>
+Name : <input type='text' name='name' id='name'></input>
+
+<button id='submitButton'>Submit</button>
+</body>
+</html>

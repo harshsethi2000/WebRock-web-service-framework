@@ -19,6 +19,9 @@ private List<AutoWiredField> autoWiredFields;
 private List<RequestParameterPojo> requestParameters;
 private boolean isJson;
 private List<InjectRequestParameterPojo> injectRequestParameters;
+private boolean isSecured;
+private String checkPost;
+private String guard;
 public Service()
 {
 this.url="";
@@ -36,6 +39,9 @@ this.injectRequestScope=false;
 this.injectApplicationScope=false;
 this.injectApplicationDirectory=false;
 this.isJson=false;
+this.isSecured=false;
+this.guard="";
+this.checkPost="";
 }
 public void setUrl(String url)
 {
@@ -167,6 +173,30 @@ this.injectRequestParameters=injectRequestParameters;
 public List<InjectRequestParameterPojo> getInjectRequestParameters()
 {
 return this.injectRequestParameters;
+}
+public void setIsSecured(boolean isSecured)
+{
+this.isSecured=isSecured;
+}
+public boolean getIsSecured()
+{
+return this.isSecured;
+}
+public void setCheckPost(String checkPost)
+{
+this.checkPost=checkPost;
+}
+public String getCheckPost()
+{
+return this.checkPost;
+}
+public void setGuard(String guard)
+{
+this.guard=guard;
+}
+public String getGuard()
+{
+return this.guard;
 }
 
 }
